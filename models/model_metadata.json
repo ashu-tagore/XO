@@ -1,0 +1,64 @@
+{
+  "model_type": "RandomForestClassifier",
+  "performance": {
+    "f1_score": 0.9753086419753086,
+    "roc_auc": 0.9975055432372506,
+    "precision": 0.9875,
+    "recall": 0.9634146341463414
+  },
+  "features": [
+    "pl_rade",
+    "pl_bmasse",
+    "pl_orbsmax",
+    "st_teff",
+    "st_mass",
+    "pl_eqt",
+    "stellar_luminosity",
+    "hz_position",
+    "in_habitable_zone",
+    "esi_radius",
+    "esi_mass",
+    "esi_temperature",
+    "esi_surface",
+    "escape_velocity_ratio",
+    "stellar_flux",
+    "habitability_score"
+  ],
+  "feature_importance": {
+    "pl_rade": 0.2774172847484525,
+    "pl_bmasse": 0.010580645900728174,
+    "pl_orbsmax": 0.030900936209690956,
+    "st_teff": 0.008288162245988011,
+    "st_mass": 0.008704348498984191,
+    "pl_eqt": 0.012756933632829093,
+    "stellar_luminosity": 0.00545315537426501,
+    "hz_position": 0.03741275623466418,
+    "in_habitable_zone": 0.005319478578134383,
+    "esi_radius": 0.5027867488065489,
+    "esi_mass": 0.00634654529104,
+    "esi_temperature": 0.011195945693800242,
+    "esi_surface": 0.02517040534506068,
+    "escape_velocity_ratio": 0.003206704901971188,
+    "stellar_flux": 0.02255826445838887,
+    "habitability_score": 0.0319016840794537
+  },
+  "preprocessing": {
+    "imputation_strategy": "median",
+    "scaling": "none_required_for_random_forest",
+    "missing_features": [
+      "pl_bmasse",
+      "pl_eqt",
+      "esi_mass",
+      "esi_temperature",
+      "esi_surface",
+      "escape_velocity_ratio",
+      "stellar_flux"
+    ]
+  },
+  "validation": {
+    "train_size": 1383,
+    "test_size": 346,
+    "cross_validation": "5-fold stratified",
+    "physics_validation_score": 0.5
+  }
+}
