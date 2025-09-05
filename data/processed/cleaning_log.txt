@@ -1,0 +1,15 @@
+XO Project - Data Cleaning Log
+========================================
+
+Original dataset: 38,779 planets
+Final dataset: 1,729 planets
+Retention rate: 4.5%
+
+Cleaning steps performed:
+- Removed 86 planets with unrealistic pl_rade
+- Removed 178 planets with unrealistic pl_bmasse
+- Removed 10 planets with unrealistic pl_orbsmax
+- Removed 4 planets with unrealistic st_teff
+- Removed 45 planets with unrealistic st_mass
+- Removed 20 planets with unrealistic pl_eqt
+- Removed 32,541 duplicate planets
