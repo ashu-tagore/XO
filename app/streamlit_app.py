@@ -2,10 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import joblib
-from sklearn.impute import SimpleImputer
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -171,7 +168,7 @@ def main():
     elif page == "📚 About & Documentation":
         show_documentation_page()
 
-def show_home_page(df, model):
+def show_home_page(df, _):
     """Home page with project overview"""
     col1, col2 = st.columns([2, 1])
 
@@ -217,10 +214,10 @@ def show_home_page(df, model):
         st.metric("Discovery Timespan", f"{discovery_years} years")
 
         # Quick visualization
-        if 'stellar_type' in df.columns:
-            stellar_dist = df['stellar_type'].value_counts()
-            fig = px.pie(values=stellar_dist.values, names=stellar_dist.index,
-                        title="Stellar Types in Dataset")
+        if 'discoverymethod' in df.columns:
+            method_dist = df['discoverymethod'].value_counts().head(5)
+            fig = px.pie(values=method_dist.values, names=method_dist.index,
+                        title="Top Discovery Methods")
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -375,7 +372,7 @@ def show_prediction_page(model):
                 if pl_rade > 4:
                     st.warning("⚠️ Large planet likely to be a gas giant - habitability unlikely")
 
-        except Exception as e:
+        except (ValueError, IndexError) as e:
             st.error(f"Prediction failed: {str(e)}")
             st.write("Please check your input parameters and try again.")
 
@@ -404,6 +401,12 @@ def show_exploration_page(df):
     st.markdown("### Filter and Explore")
 
     filter_col1, filter_col2 = st.columns(2)
+
+    # Initialize default values
+    size_range = None
+    methods = []
+    temp_range = None
+    year_range = None
 
     with filter_col1:
         # Planet size filter
@@ -482,7 +485,7 @@ def show_exploration_page(df):
                 labels={'pl_orbsmax': 'Orbital Distance (AU)', 'pl_rade': 'Planet Radius (Earth radii)'},
                 hover_data=['pl_name'] if 'pl_name' in filtered_df.columns else None
             )
-            fig.update_xaxis(type="log")
+            fig.update_xaxes(type="log")
             st.plotly_chart(fig, use_container_width=True)
 
     with viz_col2:
@@ -673,8 +676,13 @@ def show_famous_planets_page(df, model):
 
             st.write("")
 
-    # Model validation summary
-    st.markdown("### Validation Summary")
+def show_documentation_page():
+    """Documentation and methodology"""
+    st.markdown("## 📚 Documentation & Methodology")
 
-    habitable_planets = [r for r in results if r['Category'] == 'Known Potentially Habitable']
-    non_habitable_planets = [r for r in results if r['Category'] == 'Famous Non-Habitable']
+    # Project overview
+    st.markdown("### Project Overview")
+    st.write("""
+    The XO (eXOplanet) Habitability Classifier is an end-to-end machine learning pipeline
+    designed to identify potentially habitable exoplanets using real NASA data. This project
+    combines astronomical physics""")
