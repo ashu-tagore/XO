@@ -596,7 +596,7 @@ def show_enhanced_predictor(model, model_status):
                 if st.form_submit_button("🌍 Earth-like System", use_container_width=True):
                     pl_rade, pl_orbsmax, st_teff, st_mass = 1.0, 1.0, 5778, 1.0
 
-        if analyze:
+        if submitted:
             # Perform analysis based on selected mode
             st.markdown("---")
             st.markdown("## 🎯 Habitability Analysis Results")
