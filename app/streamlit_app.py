@@ -601,235 +601,235 @@ def show_enhanced_predictor(model, model_status):
             st.markdown("---")
             st.markdown("## 🎯 Habitability Analysis Results")
 
-            # Always get physics analysis
-            physics_result = assess_habitability_physics(pl_rade, pl_orbsmax, st_teff, st_mass, pl_eqt)
+        # Always get physics analysis
+        physics_result = assess_habitability_physics(pl_rade, pl_orbsmax, st_teff, st_mass, pl_eqt)
 
-            # Get AI analysis if available
-            ai_result = None
-            ai_confidence = None
-            if model is not None and model_status == "loaded":
-                try:
-                    features = prepare_features_for_model(pl_rade, pl_orbsmax, st_teff, st_mass, pl_eqt)
-                    ai_prediction = model.predict(features)[0]
-                    ai_probabilities = model.predict_proba(features)[0]
-                    ai_confidence = max(ai_probabilities) * 100
+        # Get AI analysis if available
+        ai_result = None
+        ai_confidence = None
+        if model is not None and model_status == "loaded":
+            try:
+                features = prepare_features_for_model(pl_rade, pl_orbsmax, st_teff, st_mass, pl_eqt)
+                ai_prediction = model.predict(features)[0]
+                ai_probabilities = model.predict_proba(features)[0]
+                ai_confidence = max(ai_probabilities) * 100
 
-                    # Convert AI prediction to readable result
-                    if ai_prediction == 1:
-                        ai_result = {
-                            'category': 'Potentially Habitable',
-                            'color_class': 'habitable',
-                            'score': ai_confidence
-                        }
-                    else:
-                        ai_result = {
-                            'category': 'Not Habitable',
-                            'color_class': 'not-habitable',
-                            'score': ai_confidence
-                        }
-                except Exception as e:
-                    st.error(f"AI Model Error: {str(e)}")
-                    ai_result = None
-
-            # Display results based on mode
-            if analysis_mode == "⚖️ Comparison Mode" and ai_result:
-                # Side-by-side comparison
-                col1, col2 = st.columns(2)
-
-                with col1:
-                    st.markdown("### 🤖 AI Model Prediction")
-                    st.markdown(f"""
-                    <div class="prediction-result ai-prediction">
-                        <h3>🤖 AI MODEL SAYS:</h3>
-                        <h2>{ai_result['category'].upper()}</h2>
-                        <h3>Confidence: {ai_confidence:.1f}%</h3>
-                        <p>Machine Learning Analysis</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                with col2:
-                    st.markdown("### 🔬 Physics-Based Analysis")
-                    st.markdown(f"""
-                    <div class="prediction-result physics-prediction">
-                        <h3>🔬 PHYSICS SAYS:</h3>
-                        <h2>{physics_result['category'].upper()}</h2>
-                        <h3>Score: {physics_result['score']}/100</h3>
-                        <p>Traditional Astronomical Analysis</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                # Agreement analysis
-                ai_habitable = ai_result['category'] == 'Potentially Habitable'
-                physics_habitable = physics_result['score'] >= 65
-
-                if ai_habitable == physics_habitable:
-                    st.success("✅ **AI and Physics Analysis AGREE** - High confidence in result!")
+                # Convert AI prediction to readable result
+                if ai_prediction == 1:
+                    ai_result = {
+                        'category': 'Potentially Habitable',
+                        'color_class': 'habitable',
+                        'score': ai_confidence
+                    }
                 else:
-                    st.warning("⚠️ **AI and Physics Analysis DISAGREE** - Requires expert review")
+                    ai_result = {
+                        'category': 'Not Habitable',
+                        'color_class': 'not-habitable',
+                        'score': ai_confidence
+                    }
+            except Exception as e:
+                st.error(f"AI Model Error: {str(e)}")
+                ai_result = None
 
-                    # Explain disagreement
-                    if ai_habitable and not physics_habitable:
-                        st.info("🤖 AI detected habitability patterns not captured by simple physics rules")
-                    else:
-                        st.info("🔬 Physics suggests habitability but AI found concerning factors in the data")
+        # Display results based on mode
+        if analysis_mode == "⚖️ Comparison Mode" and ai_result:
+            # Side-by-side comparison
+            col1, col2 = st.columns(2)
 
-            elif ai_result:
-                # AI + Physics mode
+            with col1:
                 st.markdown("### 🤖 AI Model Prediction")
                 st.markdown(f"""
                 <div class="prediction-result ai-prediction">
-                    <h2>🤖 AI MODEL PREDICTION</h2>
-                    <h1>{ai_result['category'].upper()}</h1>
-                    <h2>Confidence: {ai_confidence:.1f}%</h2>
-                    <p>Based on machine learning analysis of 1,729+ planets</p>
+                    <h3>🤖 AI MODEL SAYS:</h3>
+                    <h2>{ai_result['category'].upper()}</h2>
+                    <h3>Confidence: {ai_confidence:.1f}%</h3>
+                    <p>Machine Learning Analysis</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Physics validation
-                st.markdown("### 🔬 Physics Validation")
-                st.markdown(f"""
-                <div class="prediction-result {physics_result['color_class']}">
-                    <h3>Physics Score: {physics_result['score']}/100</h3>
-                    <h3>Category: {physics_result['category']}</h3>
-                </div>
-                """, unsafe_allow_html=True)
-
-            else:
-                # Physics only mode
+            with col2:
                 st.markdown("### 🔬 Physics-Based Analysis")
                 st.markdown(f"""
-                <div class="prediction-result {physics_result['color_class']}">
-                    <h1>{physics_result['category'].upper()}</h1>
-                    <h2>Habitability Score: {physics_result['score']}/100</h2>
-                    <p>Based on established astronomical principles</p>
+                <div class="prediction-result physics-prediction">
+                    <h3>🔬 PHYSICS SAYS:</h3>
+                    <h2>{physics_result['category'].upper()}</h2>
+                    <h3>Score: {physics_result['score']}/100</h3>
+                    <p>Traditional Astronomical Analysis</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-                if model_status != "loaded":
-                    st.info("ℹ️ **Note:** AI model not loaded. Showing physics-based analysis only. Load the trained model for AI predictions.")
+            # Agreement analysis
+            ai_habitable = ai_result['category'] == 'Potentially Habitable'
+            physics_habitable = physics_result['score'] >= 65
 
-            # Model prediction indicator
-            st.markdown("### 📊 Prediction Source")
-
-            col1, col2, col3 = st.columns(3)
-
-            with col1:
-                if ai_result:
-                    st.success("✅ **AI Model Used**\nMachine learning prediction")
-                else:
-                    st.warning("⚠️ **AI Model Not Used**\nModel not available")
-
-            with col2:
-                st.success("✅ **Physics Analysis Used**\nAstronomical calculations")
-
-            with col3:
-                confidence_source = "AI Confidence" if ai_result else "Physics Score"
-                confidence_value = f"{ai_confidence:.1f}%" if ai_result else f"{physics_result['score']}/100"
-                st.metric("Primary Confidence", confidence_value, help=f"Based on {confidence_source}")
-
-            # Detailed factor analysis
-            st.markdown("### 🔬 Detailed Factor Analysis")
-
-            for factor, points, explanation in physics_result['factors']:
-                if "✅" in factor:
-                    st.success(f"**{factor}** (+{points} pts): {explanation}")
-                elif "⚠️" in factor:
-                    st.warning(f"**{factor}** (+{points} pts): {explanation}")
-                elif "🔥" in factor or "🧊" in factor or "❄️" in factor:
-                    st.error(f"**{factor}** (+{points} pts): {explanation}")
-                else:
-                    st.info(f"**{factor}** (+{points} pts): {explanation}")
-
-            # System parameters summary
-            st.markdown("### 📊 System Summary")
-
-            col1, col2, col3, col4 = st.columns(4)
-
-            with col1:
-                st.metric("Stellar Luminosity", f"{physics_result['luminosity']:.2f} L☉",
-                         help="Brightness compared to our Sun")
-
-            with col2:
-                st.metric("HZ Inner Boundary", f"{physics_result['hz_inner']:.3f} AU",
-                         help="Closest distance for liquid water")
-
-            with col3:
-                st.metric("HZ Outer Boundary", f"{physics_result['hz_outer']:.3f} AU",
-                         help="Farthest distance for liquid water")
-
-            with col4:
-                st.metric("Planet Temperature", f"{physics_result['pl_eqt']:.0f} K",
-                         help="Equilibrium surface temperature")
-
-            # Expert recommendations
-            st.markdown("### 🎓 Expert Assessment")
-
-            recommendations = []
-
-            # Overall recommendation based on combined analysis
-            if ai_result and ai_result['category'] == 'Potentially Habitable' and physics_result['score'] >= 65:
-                recommendations.append("🌟 **TOP PRIORITY TARGET** - Both AI and physics indicate high habitability potential")
-            elif ai_result and ai_result['category'] == 'Potentially Habitable':
-                recommendations.append("🤖 **AI-IDENTIFIED CANDIDATE** - Machine learning detected habitability signals")
-            elif physics_result['score'] >= 80:
-                recommendations.append("🔬 **PHYSICS-BASED CANDIDATE** - Excellent conditions according to established principles")
-            elif physics_result['score'] >= 65:
-                recommendations.append("🌍 **POTENTIAL CANDIDATE** - Good habitability conditions detected")
-            elif physics_result['score'] >= 45:
-                recommendations.append("📝 **REQUIRES FURTHER STUDY** - Mixed habitability signals")
+            if ai_habitable == physics_habitable:
+                st.success("✅ **AI and Physics Analysis AGREE** - High confidence in result!")
             else:
-                recommendations.append("📚 **RESEARCH INTEREST** - Extreme conditions worth studying")
+                st.warning("⚠️ **AI and Physics Analysis DISAGREE** - Requires expert review")
 
-            # Specific recommendations
-            if physics_result['hz_inner'] <= pl_orbsmax <= physics_result['hz_outer']:
-                recommendations.append("💧 **LIQUID WATER ZONE** - Perfect orbital position for surface water")
+                # Explain disagreement
+                if ai_habitable and not physics_habitable:
+                    st.info("🤖 AI detected habitability patterns not captured by simple physics rules")
+                else:
+                    st.info("🔬 Physics suggests habitability but AI found concerning factors in the data")
 
-            if physics_result['esi_surface'] > 0.8:
-                recommendations.append("🌍 **EARTH-LIKE CONDITIONS** - Very similar to Earth's surface environment")
+        elif ai_result:
+            # AI + Physics mode
+            st.markdown("### 🤖 AI Model Prediction")
+            st.markdown(f"""
+            <div class="prediction-result ai-prediction">
+                <h2>🤖 AI MODEL PREDICTION</h2>
+                <h1>{ai_result['category'].upper()}</h1>
+                <h2>Confidence: {ai_confidence:.1f}%</h2>
+                <p>Based on machine learning analysis of 1,729+ planets</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-            if 0.8 <= pl_rade <= 1.2:
-                recommendations.append("🪨 **ROCKY PLANET** - Likely solid surface suitable for life")
+            # Physics validation
+            st.markdown("### 🔬 Physics Validation")
+            st.markdown(f"""
+            <div class="prediction-result {physics_result['color_class']}">
+                <h3>Physics Score: {physics_result['score']}/100</h3>
+                <h3>Category: {physics_result['category']}</h3>
+            </div>
+            """, unsafe_allow_html=True)
 
-            if ai_result and ai_confidence > 85:
-                recommendations.append("🎯 **HIGH AI CONFIDENCE** - Strong machine learning signal")
+        else:
+            # Physics only mode
+            st.markdown("### 🔬 Physics-Based Analysis")
+            st.markdown(f"""
+            <div class="prediction-result {physics_result['color_class']}">
+                <h1>{physics_result['category'].upper()}</h1>
+                <h2>Habitability Score: {physics_result['score']}/100</h2>
+                <p>Based on established astronomical principles</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-            # Display recommendations
-            for rec in recommendations:
-                st.markdown(f"- {rec}")
+            if model_status != "loaded":
+                st.info("ℹ️ **Note:** AI model not loaded. Showing physics-based analysis only. Load the trained model for AI predictions.")
 
-            # Visualization
-            st.markdown("### 📈 Habitability Factors Visualization")
+        # Model prediction indicator
+        st.markdown("### 📊 Prediction Source")
 
-            # Create radar chart-like visualization using bar chart
-            factor_names = []
-            factor_scores = []
+        col1, col2, col3 = st.columns(3)
 
-            # Extract scores from factors
-            for factor, points, _ in physics_result['factors']:
-                if "Habitable Zone" in factor or "Hot" in factor or "Cold" in factor:
-                    factor_names.append("Habitable Zone")
-                    factor_scores.append(points)
-                elif "Size" in factor:
-                    factor_names.append("Planet Size")
-                    factor_scores.append(points)
-                elif "Temperature" in factor:
-                    factor_names.append("Temperature")
-                    factor_scores.append(points)
-                elif "Star" in factor:
-                    factor_names.append("Stellar Properties")
-                    factor_scores.append(points)
+        with col1:
+            if ai_result:
+                st.success("✅ **AI Model Used**\nMachine learning prediction")
+            else:
+                st.warning("⚠️ **AI Model Not Used**\nModel not available")
 
-            if factor_names:
-                fig = px.bar(
-                    x=factor_names,
-                    y=factor_scores,
-                    title="Habitability Factors Breakdown",
-                    labels={'x': 'Habitability Factors', 'y': 'Points Scored'},
-                    color=factor_scores,
-                    color_continuous_scale='RdYlGn'
-                )
-                fig.update_layout(height=400, showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
+        with col2:
+            st.success("✅ **Physics Analysis Used**\nAstronomical calculations")
+
+        with col3:
+            confidence_source = "AI Confidence" if ai_result else "Physics Score"
+            confidence_value = f"{ai_confidence:.1f}%" if ai_result else f"{physics_result['score']}/100"
+            st.metric("Primary Confidence", confidence_value, help=f"Based on {confidence_source}")
+
+        # Detailed factor analysis
+        st.markdown("### 🔬 Detailed Factor Analysis")
+
+        for factor, points, explanation in physics_result['factors']:
+            if "✅" in factor:
+                st.success(f"**{factor}** (+{points} pts): {explanation}")
+            elif "⚠️" in factor:
+                st.warning(f"**{factor}** (+{points} pts): {explanation}")
+            elif "🔥" in factor or "🧊" in factor or "❄️" in factor:
+                st.error(f"**{factor}** (+{points} pts): {explanation}")
+            else:
+                st.info(f"**{factor}** (+{points} pts): {explanation}")
+
+        # System parameters summary
+        st.markdown("### 📊 System Summary")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("Stellar Luminosity", f"{physics_result['luminosity']:.2f} L☉",
+                     help="Brightness compared to our Sun")
+
+        with col2:
+            st.metric("HZ Inner Boundary", f"{physics_result['hz_inner']:.3f} AU",
+                     help="Closest distance for liquid water")
+
+        with col3:
+            st.metric("HZ Outer Boundary", f"{physics_result['hz_outer']:.3f} AU",
+                     help="Farthest distance for liquid water")
+
+        with col4:
+            st.metric("Planet Temperature", f"{physics_result['pl_eqt']:.0f} K",
+                     help="Equilibrium surface temperature")
+
+        # Expert recommendations
+        st.markdown("### 🎓 Expert Assessment")
+
+        recommendations = []
+
+        # Overall recommendation based on combined analysis
+        if ai_result and ai_result['category'] == 'Potentially Habitable' and physics_result['score'] >= 65:
+            recommendations.append("🌟 **TOP PRIORITY TARGET** - Both AI and physics indicate high habitability potential")
+        elif ai_result and ai_result['category'] == 'Potentially Habitable':
+            recommendations.append("🤖 **AI-IDENTIFIED CANDIDATE** - Machine learning detected habitability signals")
+        elif physics_result['score'] >= 80:
+            recommendations.append("🔬 **PHYSICS-BASED CANDIDATE** - Excellent conditions according to established principles")
+        elif physics_result['score'] >= 65:
+            recommendations.append("🌍 **POTENTIAL CANDIDATE** - Good habitability conditions detected")
+        elif physics_result['score'] >= 45:
+            recommendations.append("📝 **REQUIRES FURTHER STUDY** - Mixed habitability signals")
+        else:
+            recommendations.append("📚 **RESEARCH INTEREST** - Extreme conditions worth studying")
+
+        # Specific recommendations
+        if physics_result['hz_inner'] <= pl_orbsmax <= physics_result['hz_outer']:
+            recommendations.append("💧 **LIQUID WATER ZONE** - Perfect orbital position for surface water")
+
+        if physics_result['esi_surface'] > 0.8:
+            recommendations.append("🌍 **EARTH-LIKE CONDITIONS** - Very similar to Earth's surface environment")
+
+        if 0.8 <= pl_rade <= 1.2:
+            recommendations.append("🪨 **ROCKY PLANET** - Likely solid surface suitable for life")
+
+        if ai_result and ai_confidence > 85:
+            recommendations.append("🎯 **HIGH AI CONFIDENCE** - Strong machine learning signal")
+
+        # Display recommendations
+        for rec in recommendations:
+            st.markdown(f"- {rec}")
+
+        # Visualization
+        st.markdown("### 📈 Habitability Factors Visualization")
+
+        # Create radar chart-like visualization using bar chart
+        factor_names = []
+        factor_scores = []
+
+        # Extract scores from factors
+        for factor, points, _ in physics_result['factors']:
+            if "Habitable Zone" in factor or "Hot" in factor or "Cold" in factor:
+                factor_names.append("Habitable Zone")
+                factor_scores.append(points)
+            elif "Size" in factor:
+                factor_names.append("Planet Size")
+                factor_scores.append(points)
+            elif "Temperature" in factor:
+                factor_names.append("Temperature")
+                factor_scores.append(points)
+            elif "Star" in factor:
+                factor_names.append("Stellar Properties")
+                factor_scores.append(points)
+
+        if factor_names:
+            fig = px.bar(
+                x=factor_names,
+                y=factor_scores,
+                title="Habitability Factors Breakdown",
+                labels={'x': 'Habitability Factors', 'y': 'Points Scored'},
+                color=factor_scores,
+                color_continuous_scale='RdYlGn'
+            )
+            fig.update_layout(height=400, showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
 
 def show_enhanced_explorer(df):
     """Enhanced Exoplanet Database Explorer"""
